@@ -1,6 +1,7 @@
-
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from .models import CustomUser
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -16,11 +17,14 @@ class UserSerializer(serializers.ModelSerializer):
             stack=validated_data.get('stack', ''),
             portfolio=validated_data.get('portfolio', ''),
             contacts=validated_data.get('contacts', ''),
-            role=validated_data['role'],
             picture=validated_data.get('picture', None)
         )
+
+        user.save()
         return user
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'password', 'firstName', 'lastName', 'fatherName', 'email', 'stack', 'portfolio', 'contacts', 'role', 'picture')
+        fields = (
+        'id', 'username', 'password', 'firstName', 'lastName', 'fatherName', 'email', 'stack', 'portfolio', 'contacts',
+        'picture', 'groups')
