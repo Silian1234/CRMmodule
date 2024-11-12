@@ -7,9 +7,9 @@ from .serializers import UserSerializer, EventSerializer, EnrollmentStatusSerial
 from .models import CustomUser, Event, EnrollmentStatus
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.authtoken.models import Token
 
 
-# Регистрация пользователя
 class RegisterView(APIView):
     @swagger_auto_schema(
         request_body=UserSerializer,
@@ -18,8 +18,12 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Пользователь успешно создан"}, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Пользователь успешно создан",
+                "token": token.key
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
