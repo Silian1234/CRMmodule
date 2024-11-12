@@ -9,17 +9,8 @@ class CustomUser(AbstractUser):
     stack = models.CharField(max_length=255, blank=True, null=True)
     portfolio = models.TextField(blank=True, null=True)
     contacts = models.TextField(blank=True, null=True)
-    role = models.CharField(
-        max_length=20,
-        choices=[
-            ('student', 'Student'),
-            ('curator', 'Curator'),
-            ('leader', 'Leader'),
-            ('administrator', 'Administrator')
-        ], default='student'
-    )
     #requests = models.JSONField(default=list, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.firstName} {self.lastName} ({self.role})"
+        return f"{self.firstName} {self.lastName} ({self.groups})"
