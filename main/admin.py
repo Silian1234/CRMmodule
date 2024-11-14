@@ -7,7 +7,7 @@ from django.contrib.admin.sites import AlreadyRegistered
 from .models import Event, CustomUser
 from .admin_forms import EventAdminForm
 
-# Кастомный класс админки для CustomUser
+
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
