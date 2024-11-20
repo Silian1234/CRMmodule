@@ -8,7 +8,8 @@ from .models import CustomUser, Event, EnrollmentStatus
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.authtoken.models import Token
-
+from django.contrib.auth import authenticate
+from rest_framework.generics import RetrieveUpdateAPIView
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -57,3 +58,35 @@ class EnrollmentStatusDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
     permission_classes = [IsAdminUser]
+
+
+class LoginView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Пароль'),
+            }
+        ),
+        responses={200: 'Успешная авторизация', 400: 'Ошибка авторизации'}
+    )
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(username=username, password=password)
+
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Успешная авторизация",
+                "token": token.key
+            }, status=status.HTTP_200_OK)
+        return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
+
+class ProfileView(RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
