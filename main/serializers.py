@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
-from .models import CustomUser, Event, EnrollmentStatus
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,11 +42,16 @@ class EventSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    participants = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        many=True,
+        required=False
+    )
 
     class Meta:
         model = Event
         fields = ('id', 'name', 'description', 'type', 'start_date', 'end_date',
-                  'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator')
+                  'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'participants')
 
     def validate_leader(self, value):
         if value and not value.groups.filter(name="leader").exists():

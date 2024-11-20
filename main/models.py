@@ -28,24 +28,37 @@ class Event(models.Model):
     enrollment_deadline = models.DateTimeField()
     capacity = models.PositiveIntegerField()
     telegram_chat_link = models.URLField(blank=True, null=True)
-
     leader = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name='leader_events',
         on_delete=models.SET_NULL,
+        related_name='led_events',
         null=True,
         blank=True
     )
     curator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name='curated_events',
         on_delete=models.SET_NULL,
+        related_name='curated_events',
         null=True,
+        blank=True
+    )
+    participants = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='event_participants',
         blank=True
     )
 
     def __str__(self):
         return self.name
+
+    def can_add_participant(self):
+        current_count = self.participants.count()
+        return current_count < self.capacity
+
+    def add_participant(self, user):
+        if not self.can_add_participant():
+            raise ValueError("Превышено максимальное количество участников")
+        self.participants.add(user)
 
 class EnrollmentStatus(models.Model):
     STATUS_CHOICES = [

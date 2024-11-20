@@ -4,7 +4,7 @@ from django.apps import apps
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AlreadyRegistered
 
-from .models import Event, CustomUser
+from .models import *
 from .admin_forms import EventAdminForm
 
 
@@ -26,11 +26,18 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
 
-# Кастомный класс админки для Event
 class EventAdmin(admin.ModelAdmin):
-    form = EventAdminForm  # Используем кастомную форму для фильтрации пользователей по группам
-    list_display = ('name', 'type', 'start_date', 'end_date', 'leader', 'curator')  # Отображаем нужные поля
+    list_display = ('name', 'type', 'start_date', 'end_date', 'leader', 'curator', 'participant_count')
     list_filter = ('type', 'start_date', 'end_date')
+    search_fields = ('name', 'description')
+    filter_horizontal = ('participants',)  # Удобное управление списком участников
+
+    def participant_count(self, obj):
+        """Подсчитывает количество участников"""
+        return obj.participants.count()
+
+    participant_count.short_description = "Количество участников"
+
 
 # Регистрируем модели с кастомными классами
 admin.site.register(CustomUser, CustomUserAdmin)

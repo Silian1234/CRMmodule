@@ -84,6 +84,17 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
 
+class AddParticipantView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, event_id):
+        event = Event.objects.get(id=event_id)
+        try:
+            event.add_participant(request.user)
+            return Response({"message": "Вы успешно добавлены к событию"}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class ProfileView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
