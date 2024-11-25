@@ -4,8 +4,15 @@ from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=False)
+    username = serializers.CharField(required=False)
+    groups = serializers.SerializerMethodField()
 
+    def get_groups(self, obj):
+        groups = obj.groups.all()
+        if groups.exists():
+            return groups.first().name
+        return "Нет группы"
     def create(self, validated_data):
         user = CustomUser.objects.create_user(
             username=validated_data['username'],
@@ -29,7 +36,14 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'password', 'firstName', 'lastName', 'fatherName', 'email', 'stack', 'portfolio',
             'contacts', 'picture', 'groups'
         )
-
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 class EventSerializer(serializers.ModelSerializer):
     leader = serializers.PrimaryKeyRelatedField(
