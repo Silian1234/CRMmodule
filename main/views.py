@@ -10,6 +10,7 @@ from drf_yasg import openapi
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.generics import RetrieveUpdateAPIView
+from CRMmodule.authentication import *
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -29,6 +30,7 @@ class RegisterView(APIView):
 
 
 class EventListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAdminUser]
@@ -40,6 +42,7 @@ class EventListCreateView(generics.ListCreateAPIView):
 
 
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAdminUser]
@@ -50,11 +53,13 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().get_permissions()
 
 class EnrollmentStatusListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
     permission_classes = [IsAdminUser]
 
 class EnrollmentStatusDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
     permission_classes = [IsAdminUser]
@@ -85,6 +90,7 @@ class LoginView(APIView):
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
 
 class AddParticipantView(APIView):
+    authentication_classes = [BearerTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, event_id):
@@ -96,9 +102,9 @@ class AddParticipantView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(RetrieveUpdateAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-
     def get_object(self):
         return self.request.user
 
