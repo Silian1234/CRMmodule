@@ -11,6 +11,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.generics import RetrieveUpdateAPIView
 from CRMmodule.authentication import *
+from rest_framework.permissions import DjangoModelPermissions
 
 class RegisterView(APIView):
     @swagger_auto_schema(
