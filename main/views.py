@@ -33,8 +33,6 @@ class EventListCreateView(generics.ListCreateAPIView):
     authentication_classes = [BearerTokenAuthentication]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAdminUser]
-
     def get_permissions(self):
         if self.request.method == 'GET':
             self.permission_classes = [IsAuthenticated]
@@ -45,7 +43,6 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [BearerTokenAuthentication]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAdminUser]
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -56,13 +53,11 @@ class EnrollmentStatusListCreateView(generics.ListCreateAPIView):
     authentication_classes = [BearerTokenAuthentication]
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
-    permission_classes = [IsAdminUser]
 
 class EnrollmentStatusDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [BearerTokenAuthentication]
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
-    permission_classes = [IsAdminUser]
 
 
 class LoginView(APIView):
