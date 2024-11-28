@@ -4,6 +4,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from CRMmodule.authentication import BearerTokenAuthentication
+
 schema_view = get_schema_view(
     openapi.Info(
         title="CRM API",
@@ -11,6 +13,7 @@ schema_view = get_schema_view(
         description="API для модуля CRM",
     ),
     public=True,
+    authentication_classes=(BearerTokenAuthentication,),
     permission_classes=(permissions.AllowAny,),
 )
 urlpatterns = [
