@@ -30,25 +30,22 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'start_date', 'end_date', 'leader', 'curator', 'participant_count')
     list_filter = ('type', 'start_date', 'end_date')
     search_fields = ('name', 'description')
-    filter_horizontal = ('participants',)  # Удобное управление списком участников
+    filter_horizontal = ('participants',)
 
     def participant_count(self, obj):
-        """Подсчитывает количество участников"""
         return obj.participants.count()
 
     participant_count.short_description = "Количество участников"
 
 
-# Регистрируем модели с кастомными классами
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Event, EventAdmin)
 
-# Автоматическая регистрация всех остальных моделей
-app = apps.get_app_config('main')  # Замените 'crm' на имя вашего приложения
+app = apps.get_app_config('main')
 
 for model_name, model in app.models.items():
     try:
-        if model not in admin.site._registry:  # Проверяем, зарегистрирована ли модель
+        if model not in admin.site._registry:
             admin.site.register(model)
     except AlreadyRegistered:
         pass
