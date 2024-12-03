@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     username = serializers.CharField(required=False)
     groups = serializers.SerializerMethodField()
+    picture = serializers.ImageField(required=False, allow_null=True)
 
     def get_groups(self, obj):
         groups = obj.groups.all()
@@ -46,6 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 class EventSerializer(serializers.ModelSerializer):
+    picture = serializers.ImageField(required=False, allow_null=True)
     leader = serializers.PrimaryKeyRelatedField(
         queryset=CustomUser.objects.filter(groups__name="leader"),
         required=False,
@@ -65,7 +67,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'description', 'type', 'start_date', 'end_date',
-                  'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'participants')
+                  'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'participants', 'picture')
 
     def validate_leader(self, value):
         if value and not value.groups.filter(name="leader").exists():

@@ -1,3 +1,4 @@
+from django.conf.urls.static import static
 from django.urls import path
 from .views import *
 
@@ -12,3 +13,6 @@ urlpatterns = [
     path('profile/<int:pk>/', UserProfileView.as_view(), name='user-profile'),
     path('events/<int:event_id>/add-participant/', AddParticipantView.as_view(), name='add-participant'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
