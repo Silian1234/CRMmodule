@@ -1,4 +1,5 @@
 # crm/views.py
+from django.utils import timezone
 from rest_framework import status, generics
 from rest_framework.parsers import *
 from rest_framework.response import Response
@@ -112,6 +113,12 @@ class AddParticipantView(APIView):
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
+        if timezone.now() > event.enrollment_deadline:
+            return Response(
+                {"error": "Дедлайн регистрации на это мероприятие уже прошёл"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
             event.add_participant(request.user)
             return Response({"message": "Вы успешно добавлены к событию"}, status=status.HTTP_200_OK)
