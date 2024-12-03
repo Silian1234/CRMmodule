@@ -1,5 +1,6 @@
 # crm/views.py
 from rest_framework import status, generics
+from rest_framework.parsers import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -14,8 +15,21 @@ from CRMmodule.authentication import *
 from rest_framework.permissions import DjangoModelPermissions
 
 class RegisterView(APIView):
+    parser_classes = [MultiPartParser]
+
     @swagger_auto_schema(
-        request_body=UserSerializer,
+        manual_parameters=[
+            openapi.Parameter('username', openapi.IN_FORM, description='Имя пользователя', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('password', openapi.IN_FORM, description='Пароль', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('firstName', openapi.IN_FORM, description='Имя', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('lastName', openapi.IN_FORM, description='Фамилия', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('fatherName', openapi.IN_FORM, description='Отчество', type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('email', openapi.IN_FORM, description='Email', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('stack', openapi.IN_FORM, description='Стэк', type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('portfolio', openapi.IN_FORM, description='Портфолио', type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('contacts', openapi.IN_FORM, description='Контакты', type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('picture', openapi.IN_FORM, description='Фото', type=openapi.TYPE_FILE, required=False),
+        ],
         responses={201: 'Пользователь успешно создан', 400: 'Ошибка валидации'}
     )
     def post(self, request):
@@ -31,6 +45,7 @@ class RegisterView(APIView):
 
 
 class EventListCreateView(generics.ListCreateAPIView):
+    parser_classes = [MultiPartParser]
     authentication_classes = [BearerTokenAuthentication]
     permission_classes = [DjangoModelPermissions]
     queryset = Event.objects.all()
@@ -42,6 +57,7 @@ class EventListCreateView(generics.ListCreateAPIView):
 
 
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    parser_classes = [MultiPartParser]
     authentication_classes = [BearerTokenAuthentication]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -53,6 +69,7 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().get_permissions()
 
 class EnrollmentStatusListCreateView(generics.ListCreateAPIView):
+    parser_classes = [MultiPartParser]
     authentication_classes = [BearerTokenAuthentication]
     queryset = EnrollmentStatus.objects.all()
     serializer_class = EnrollmentStatusSerializer
@@ -66,14 +83,13 @@ class EnrollmentStatusDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class LoginView(APIView):
+    parser_classes = [MultiPartParser]
+
     @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
-                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Пароль'),
-            }
-        ),
+        manual_parameters=[
+            openapi.Parameter('username', openapi.IN_FORM, description='Имя пользователя', type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('password', openapi.IN_FORM, description='Пароль', type=openapi.TYPE_STRING, required=True),
+        ],
         responses={200: 'Успешная авторизация', 400: 'Ошибка авторизации'}
     )
     def post(self, request):
@@ -90,6 +106,7 @@ class LoginView(APIView):
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
 
 class AddParticipantView(APIView):
+    parser_classes = [MultiPartParser]
     authentication_classes = [BearerTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -102,12 +119,15 @@ class AddParticipantView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(RetrieveUpdateAPIView):
+    parser_classes = [MultiPartParser]
     authentication_classes = [BearerTokenAuthentication]
-    serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
     def get_object(self):
         return self.request.user
 
 class UserProfileView(RetrieveUpdateAPIView):
+    parser_classes = [MultiPartParser]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
