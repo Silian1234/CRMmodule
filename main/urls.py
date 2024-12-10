@@ -12,6 +12,8 @@ urlpatterns = [
     path('profile/me/', ProfileView.as_view(), name='profile'),
     path('profile/<int:pk>/', UserProfileView.as_view(), name='user-profile'),
     path('events/<int:event_id>/add-participant/', AddParticipantView.as_view(), name='add-participant'),
+    path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    path('notifications/<int:pk>/edit/', MarkNotificationReadView.as_view(), name='mark-notification-read'),
 ]
 
 if settings.DEBUG:

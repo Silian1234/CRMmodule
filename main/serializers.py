@@ -83,3 +83,8 @@ class EnrollmentStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnrollmentStatus
         fields = ('id', 'student', 'event', 'status', 'updated_at')
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'message', 'created_at', 'is_read']
