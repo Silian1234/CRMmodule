@@ -5,13 +5,13 @@ from rest_framework.parsers import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from .serializers import UserSerializer, EventSerializer, EnrollmentStatusSerializer
-from .models import CustomUser, Event, EnrollmentStatus
+from .serializers import UserSerializer, EventSerializer, EnrollmentStatusSerializer, NotificationSerializer
+from .models import CustomUser, Event, EnrollmentStatus, Notification
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, UpdateAPIView
 from CRMmodule.authentication import *
 from rest_framework.permissions import DjangoModelPermissions
 
@@ -138,3 +138,24 @@ class UserProfileView(RetrieveUpdateAPIView):
     parser_classes = [MultiPartParser]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+
+class NotificationListView(ListAPIView):
+    parser_classes = [MultiPartParser]
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+
+class MarkNotificationReadView(UpdateAPIView):
+    parser_classes = [MultiPartParser]
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user, is_read=False)
+
+    def perform_update(self, serializer):
+        serializer.instance.is_read = True
+        serializer.save()
