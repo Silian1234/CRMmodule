@@ -14,4 +14,5 @@ urlpatterns = [
     path('events/<int:event_id>/add-participant/', AddParticipantView.as_view(), name='add-participant'),
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/edit/', MarkNotificationReadView.as_view(), name='mark-notification-read'),
+    path('leader-curator/', LeaderCuratorListView.as_view(), name='leader-curator'),
 ]

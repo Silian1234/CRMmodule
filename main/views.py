@@ -1,4 +1,5 @@
 # crm/views.py
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status, generics
 from rest_framework.parsers import *
@@ -139,6 +140,12 @@ class UserProfileView(RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
+class LeaderCuratorListView(ListAPIView):
+    parser_classes = [MultiPartParser]
+    serializer_class = UserSerializer
+    def get_queryset(self):
+        return CustomUser.objects.filter(Q(groups__name='leader') | Q(groups__name='curator'))
+
 class NotificationListView(ListAPIView):
     parser_classes = [MultiPartParser]
     serializer_class = NotificationSerializer
@@ -146,7 +153,6 @@ class NotificationListView(ListAPIView):
 
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user).order_by('-created_at')
-
 
 class MarkNotificationReadView(UpdateAPIView):
     parser_classes = [MultiPartParser]

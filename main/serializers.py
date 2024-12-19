@@ -47,22 +47,9 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 class EventSerializer(serializers.ModelSerializer):
-    picture = serializers.ImageField(required=False, allow_null=True)
-    leader = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.filter(groups__name="leader"),
-        required=False,
-        allow_null=True
-    )
-    curator = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.filter(groups__name="curator"),
-        required=False,
-        allow_null=True
-    )
-    participants = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(),
-        many=True,
-        required=False
-    )
+    leader = UserSerializer(read_only=True)
+    curator = UserSerializer(read_only=True)
+    participants = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
