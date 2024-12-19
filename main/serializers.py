@@ -49,22 +49,31 @@ class UserSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     leader = UserSerializer(read_only=True)
     curator = UserSerializer(read_only=True)
+    leader_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), required=False, allow_null=True, source='leader'
+    )
+    curator_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), required=False, allow_null=True, source='curator'
+    )
     participants = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'type', 'start_date', 'end_date',
-                  'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'participants', 'picture')
+        fields = (
+            'id', 'name', 'description', 'type', 'start_date', 'end_date',
+            'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'leader_id', 'curator_id', 'participants', 'picture'
+        )
 
-    def validate_leader(self, value):
+    def validate_leader_id(self, value):
         if value and not value.groups.filter(name="leader").exists():
             raise serializers.ValidationError("Выбранный пользователь не является лидером.")
         return value
 
-    def validate_curator(self, value):
+    def validate_curator_id(self, value):
         if value and not value.groups.filter(name="curator").exists():
             raise serializers.ValidationError("Выбранный пользователь не является куратором.")
         return value
+
 
 class EnrollmentStatusSerializer(serializers.ModelSerializer):
     class Meta:
