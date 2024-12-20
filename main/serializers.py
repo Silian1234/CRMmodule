@@ -46,14 +46,23 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class EventSerializer(serializers.ModelSerializer):
     leader = UserSerializer(read_only=True)
     curator = UserSerializer(read_only=True)
     leader_id = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(), required=False, allow_null=True, source='leader'
+        queryset=CustomUser.objects.filter(groups__name='leader'),
+        source='leader',
+        write_only=True,
+        required=False,
+        allow_null=True
     )
     curator_id = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(), required=False, allow_null=True, source='curator'
+        queryset=CustomUser.objects.filter(groups__name='curator'),
+        source='curator',
+        write_only=True,
+        required=False,
+        allow_null=True
     )
     participants = UserSerializer(many=True, read_only=True)
 
@@ -61,18 +70,25 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = (
             'id', 'name', 'description', 'type', 'start_date', 'end_date',
-            'enrollment_deadline', 'capacity', 'telegram_chat_link', 'leader', 'curator', 'leader_id', 'curator_id', 'participants', 'picture'
+            'enrollment_deadline', 'capacity', 'telegram_chat_link',
+            'leader', 'curator', 'leader_id', 'curator_id', 'participants', 'picture'
         )
 
-    def validate_leader_id(self, value):
+    def validate_leader(self, value):
         if value and not value.groups.filter(name="leader").exists():
             raise serializers.ValidationError("Выбранный пользователь не является лидером.")
         return value
 
-    def validate_curator_id(self, value):
+    def validate_curator(self, value):
         if value and not value.groups.filter(name="curator").exists():
             raise serializers.ValidationError("Выбранный пользователь не является куратором.")
         return value
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
 
 
 class EnrollmentStatusSerializer(serializers.ModelSerializer):
