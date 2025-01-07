@@ -29,6 +29,7 @@ class Event(models.Model):
     capacity = models.PositiveIntegerField()
     telegram_chat_link = models.URLField(blank=True, null=True)
     picture = models.ImageField(upload_to='event_pictures/', blank=True, null=True)
+    hidden = models.BooleanField(default=False)
     leader = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

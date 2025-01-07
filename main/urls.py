@@ -15,4 +15,13 @@ urlpatterns = [
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/edit/', MarkNotificationReadView.as_view(), name='mark-notification-read'),
     path('leader-curator/', LeaderCuratorListView.as_view(), name='leader-curator'),
+    path('students/data-submitted/', DataSubmittedStudentsListView.as_view(), name='data-submitted-students'),
+    path('events/<int:event_id>/remove-student/<int:student_id>/', RemoveStudentFromEventView.as_view(),
+         name='remove-student-from-event'),
+    path('enrollment-status/user/<int:user_id>/', EnrollmentStatusFilteredListView.as_view(),
+         name='enrollment-status-user'),
+    path('enrollment-status/event/<int:event_id>/', EnrollmentStatusFilteredListView.as_view(),
+         name='enrollment-status-event'),
+    path('enrollment-status/user/<int:user_id>/event/<int:event_id>/', EnrollmentStatusFilteredListView.as_view(),
+         name='enrollment-status-user-event'),
 ]

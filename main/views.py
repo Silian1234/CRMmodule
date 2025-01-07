@@ -57,6 +57,9 @@ class EventListCreateView(generics.ListCreateAPIView):
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
+    def get_queryset(self):
+        return Event.objects.filter(hidden=False)
+
 
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = [MultiPartParser]
@@ -69,6 +72,9 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+    def get_queryset(self):
+        return Event.objects.filter(hidden=False)
 
 class EnrollmentStatusListCreateView(generics.ListCreateAPIView):
     parser_classes = [MultiPartParser]
@@ -165,3 +171,43 @@ class MarkNotificationReadView(UpdateAPIView):
     def perform_update(self, serializer):
         serializer.instance.is_read = True
         serializer.save()
+
+class DataSubmittedStudentsListView(ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        statuses = EnrollmentStatus.objects.filter(status='data_submitted')
+        student_ids = statuses.values_list('student_id', flat=True)
+        return CustomUser.objects.filter(id__in=student_ids)
+
+class EnrollmentStatusFilteredListView(ListAPIView):
+    serializer_class = EnrollmentStatusSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = EnrollmentStatus.objects.all()
+        user_id = self.kwargs.get('user_id')
+        event_id = self.kwargs.get('event_id')
+
+        if user_id:
+            queryset = queryset.filter(student_id=user_id)
+        if event_id:
+            queryset = queryset.filter(event_id=event_id)
+
+        return queryset
+
+class RemoveStudentFromEventView(APIView):
+    authentication_classes = [BearerTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, event_id, student_id):
+        try:
+            event = Event.objects.get(id=event_id)
+            student = CustomUser.objects.get(id=student_id)
+        except (Event.DoesNotExist, CustomUser.DoesNotExist):
+            return Response({"error": "Мероприятие или студент не найдены"}, status=404)
+
+        event.participants.remove(student)
+        EnrollmentStatus.objects.create(student=student, event=event, status='removed')
+        return Response({"message": "Студент удалён с мероприятия"}, status=200)
