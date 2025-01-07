@@ -1,10 +1,10 @@
-import telegram
+import telebot
 from django.conf import settings
 import asyncio
 import requests, json
 
 BOT_TOKEN = (__import__("os").environ['TELEGRAM_BOT_TOKEN'])
-bot = telegram.Bot(token=BOT_TOKEN)
+bot = telebot.TeleBot(token=BOT_TOKEN)
 user = None
 async def send_notification_to_user(user_telegram_link, message_text):
     user = user_telegram_link.split('@')[1]

@@ -71,7 +71,7 @@ class EventSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'type', 'start_date', 'end_date',
             'enrollment_deadline', 'capacity', 'telegram_chat_link',
-            'leader', 'curator', 'leader_id', 'curator_id', 'participants', 'picture'
+            'leader', 'curator', 'leader_id', 'curator_id', 'participants', 'picture', 'hidden'
         )
 
     def validate_leader(self, value):
@@ -94,7 +94,7 @@ class EventSerializer(serializers.ModelSerializer):
 class EnrollmentStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnrollmentStatus
-        fields = ('id', 'student', 'event', 'status', 'updated_at')
+        fields = ('id', 'student', 'event', 'status', 'updated_at', 'student_id', 'event_id')
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
