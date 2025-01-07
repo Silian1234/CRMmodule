@@ -172,12 +172,13 @@ class MarkNotificationReadView(UpdateAPIView):
         serializer.instance.is_read = True
         serializer.save()
 
-class DataSubmittedStudentsListView(ListAPIView):
+class DataSubmittedStudentsForEventView(ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        statuses = EnrollmentStatus.objects.filter(status='data_submitted')
+        event_id = self.kwargs.get('event_id')
+        statuses = EnrollmentStatus.objects.filter(event_id=event_id, status='data_submitted')
         student_ids = statuses.values_list('student_id', flat=True)
         return CustomUser.objects.filter(id__in=student_ids)
 
