@@ -57,7 +57,10 @@ class Event(models.Model):
         current_count = self.participants.count()
         return current_count < self.capacity
 
+
     def add_participant(self, user):
+        if self.participants.filter(id=user.id).exists():
+            raise ValueError("Пользователь уже записан на мероприятие")
         if not self.can_add_participant():
             raise ValueError("Превышено максимальное количество участников")
         self.participants.add(user)
