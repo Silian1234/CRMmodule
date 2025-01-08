@@ -91,10 +91,22 @@ class EventSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+# В serializers.py
 class EnrollmentStatusSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+
     class Meta:
         model = EnrollmentStatus
-        fields = ('id', 'student', 'event', 'status', 'updated_at', 'student_id', 'event_id')
+        fields = ('id', 'student', 'status', 'updated_at', 'student_id', 'event_id')
+
+    def get_student(self, obj):
+        student = obj.student
+        # Возвращаем ФИО студента
+        full_name = f"{student.lastName} {student.firstName}"
+        if student.fatherName:
+            full_name += f" {student.fatherName}"
+        return full_name
+
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
