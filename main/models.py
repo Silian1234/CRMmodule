@@ -72,8 +72,8 @@ class EnrollmentStatus(models.Model):
         ('completed', 'Завершил(а) прохождение мероприятия'),
         ('removed', 'Удалён(а) с мероприятия'),
     ]
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     updated_at = models.DateTimeField(auto_now=True)
 
