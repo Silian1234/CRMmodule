@@ -128,6 +128,11 @@ class AddParticipantView(APIView):
 
         try:
             event.add_participant(request.user)
+            EnrollmentStatus.objects.create(
+                student=request.user,
+                event=event,
+                status='data_submitted'
+            )
             return Response({"message": "Вы успешно добавлены к событию"}, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
