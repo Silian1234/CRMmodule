@@ -153,6 +153,7 @@ class LeaderCuratorListView(ListAPIView):
         return CustomUser.objects.filter(Q(groups__name='leader') | Q(groups__name='curator'))
 
 class NotificationListView(ListAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     parser_classes = [MultiPartParser]
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
@@ -161,6 +162,7 @@ class NotificationListView(ListAPIView):
         return Notification.objects.filter(user=self.request.user).order_by('-created_at')
 
 class MarkNotificationReadView(UpdateAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     parser_classes = [MultiPartParser]
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
@@ -173,6 +175,7 @@ class MarkNotificationReadView(UpdateAPIView):
         serializer.save()
 
 class DataSubmittedStudentsForEventView(ListAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -183,6 +186,7 @@ class DataSubmittedStudentsForEventView(ListAPIView):
         return CustomUser.objects.filter(id__in=student_ids)
 
 class EnrollmentStatusFilteredListView(ListAPIView):
+    authentication_classes = [BearerTokenAuthentication]
     serializer_class = EnrollmentStatusSerializer
     permission_classes = [IsAuthenticated]
 
